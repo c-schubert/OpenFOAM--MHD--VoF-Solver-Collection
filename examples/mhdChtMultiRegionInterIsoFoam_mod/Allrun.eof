@@ -1,0 +1,23 @@
+#!/bin/sh
+cd ${0%/*} || exit 1    # Run from this directory
+
+# Source tutorial run functions
+. $WM_PROJECT_DIR/bin/tools/RunFunctions
+
+setFields -region mixture
+setFields -region skin
+setFields -region mould
+
+potentialFoam -region mixture
+
+cpu_cores=24
+
+ElmerGrid 2 2 meshElmer -metis $cpu_cores
+
+decomposePar -allRegions
+
+mpirun -n $cpu_cores mhdChtMultiRegionInterIsoFoamCpad_mod -parallel \
+     : -n $cpu_cores ElmerSolver_mpi case_eof_harm.sif > log.eof 2>&1
+	 
+
+#------------------------------------------------------------------------------

@@ -1,0 +1,103 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.0                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+application     mhdChtMultiRegionInterIsoFoamCpad_mod;
+
+startFrom       latestTime; //startTime;  // firstTime // latestTime
+
+startTime       0;
+
+stopAt          endTime; // writeNow // nextWrite
+
+endTime         10;
+
+deltaT          0.001;
+
+writeControl    adjustable; // runTime // clockTime // cpuTime //adjustableRunTime
+
+writeInterval   0.02;
+
+purgeWrite      0;
+
+writeFormat     binary; // ascii
+
+writePrecision  8;
+
+writeCompression off; // on, off
+
+timeFormat      general; // fixed // scientific
+
+timePrecision   6;
+
+runTimeModifiable yes;
+
+adjustTimeStep  on; //off , on
+
+maxCo           0.9;
+maxAlphaCo      0.9;
+
+maxDeltaT       0.001;
+
+// Maximum diffusion number
+maxDi           2.5;
+
+functions 
+{ 
+    residuals
+    {
+        type                    solverInfo;
+        libs                    ("libutilityFunctionObjects.so");
+        enabled                 true;
+        region                  mixture;
+        fields                  (p_rgh T k epsilon alpha alpha.metal);
+        writeResidualFields     no;
+        writeControl            timeStep;
+        writeInterval           1;
+        writeFields             no;
+    }
+
+    residualsSkin
+    {
+        type                    solverInfo;
+        libs                    ("libutilityFunctionObjects.so");
+        enabled                 true;
+        region                  skin;
+        fields                  (h);
+        writeResidualFields     no;
+        writeControl            timeStep;
+        writeInterval           1;
+        writeFields             no;
+    }
+
+
+    residualsMould
+    {
+        type                    solverInfo;
+        libs                    ("libutilityFunctionObjects.so");
+        enabled                 true;
+        region                  mould;
+        fields                  (h);
+        writeResidualFields     no;
+        writeControl            timeStep;
+        writeInterval           1;
+        writeFields             no;
+    }
+}
+
+
+// ************************************************************************* //

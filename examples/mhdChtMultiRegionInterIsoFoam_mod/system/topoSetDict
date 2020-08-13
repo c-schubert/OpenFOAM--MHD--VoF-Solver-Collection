@@ -1,0 +1,76 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v1912                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    object      topoSetDict;
+}
+
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+actions
+(
+    // Mixture
+    {
+        name        mixtureCellSet;
+        type        cellSet;
+        action      new;
+        source      cylinderToCell ;
+        p1          (0 0 0);
+        p2          (0 0 -1);
+        radius      76.5E-3;
+    }
+    {
+        name    mixture;
+        type    cellZoneSet;
+        action  new;
+        source  setToCellZone;
+        set     mixtureCellSet;
+    }
+    // Skin
+    {
+        name        skinCellSet;
+        type        cellSet;
+        action      new;
+        source      cylinderAnnulusToCell;
+        p1          (0 0 0);
+        p2          (0 0 -1);
+        outerRadius 77.5E-3;
+        innerRadius 76.5E-3;
+    }
+    {
+        name    skin;
+        type    cellZoneSet;
+        action  new;
+        source  setToCellZone;
+        set     skinCellSet;
+    }
+    // Mould
+    {
+        name        mouldCellSet;
+        type        cellSet;
+        action      new;
+        source      cylinderAnnulusToCell;
+        p1          (0 0 0);
+        p2          (0 0 -1);
+        outerRadius 92.5E-3;
+        innerRadius 77.5E-3;
+    }
+    {
+        name    mould;
+        type    cellZoneSet;
+        action  new;
+        source  setToCellZone;
+        set     mouldCellSet;
+    }
+);
+
+
+// ************************************************************************* //

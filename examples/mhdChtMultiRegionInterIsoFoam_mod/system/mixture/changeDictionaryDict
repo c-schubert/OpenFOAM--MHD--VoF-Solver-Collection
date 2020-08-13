@@ -1,0 +1,327 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v1912                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system/mixture";
+    object      changeDictionaryDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+alpha.metal
+{
+    internalField   uniform 0;
+
+    boundaryField
+    {
+        INLET
+        {
+            type            fixedValue;
+            value           uniform 1;
+        }
+        OUTLET
+        {
+            type            fixedValue;
+            value           uniform 1;
+        }
+        ".*"
+        {
+            type            zeroGradient;
+        }
+        defaultFaces
+        {
+            type            empty;
+        }
+    }
+}
+
+U
+{
+    internalField   uniform (0 0 0);
+
+    boundaryField
+    {
+        INLET
+        {
+
+            type            cylindricalInletVelocity;
+            axis            (0 0 1);
+            origin          (0 0 0);
+            axialVelocity   constant -0.000422643798124;
+            radialVelocity  constant 0;
+            rpm             constant 50;
+            value           uniform (0 0 -0.000422643798124);
+        }
+
+        WALL_EL_SIDE
+        {
+            type            rotatingWallVelocity;
+            origin          (0 0 0);
+            axis            (0 0 1);
+            omega           5.23598775; // 50 RPM -> (RPM/60)*2*PI=rPs
+        }
+
+        OUTLET
+        {
+            type              zeroGradient;
+        }
+
+        WALL_FREE_SURFACE
+        {
+            type            slip;
+        }
+
+        ".*"
+        {
+            type            noSlip;
+        }
+
+        defaultFaces
+        {
+            type            empty;
+        }
+    }
+}
+
+T
+{
+    internalField   uniform 1767.15;
+
+    boundaryField
+    {
+        INLET
+        {
+            //1494 °C
+            type    fixedValue;
+            value   uniform 1767.15;
+        }
+
+        OUTLET
+        {
+          //1494 °C
+            type            inletOutlet;
+            inletValue      uniform 1767.15;
+            value           uniform 1767.15;
+        }
+
+        WALL_FREE_SURFACE
+        {
+            type            externalWallHeatFluxTemperature;
+
+            mode            coefficient;
+
+            Ta              constant 323.15;
+            h               uniform 300.0;
+            emissivity      0.8;
+
+            kappaMethod     fluidThermo;
+
+            value           $internalField;
+        }
+
+        WALL_EL_SIDE
+        {
+            type            zeroGradient;
+            value           $internalField;
+        }
+
+        "mixture_to_.*"
+        {
+            type            compressible::turbulentTemperatureCoupledBaffleMixed;
+            Tnbr            T;
+            kappaMethod     fluidThermo;
+            value           $internalField;
+        }
+
+        defaultFaces
+        {
+            type            empty;
+        }
+    }
+}
+
+epsilon
+{
+    internalField   uniform 5.35E-11;
+
+    boundaryField
+    {
+        INLET
+        {
+        type            inletOutlet;
+        inletValue      $internalField;
+        value           $internalField;
+        }
+
+        OUTLET
+        {
+        type            outletInlet;
+        outletValue     $internalField;
+        value           $internalField;
+        }
+        
+        ".*"
+        {
+        type            epsilonWallFunction; // founders edition: epsilonLowReWallFunction
+        value           $internalField;
+        }
+
+        defaultFaces
+        {
+            type            empty;
+        }
+    }
+}
+
+k
+{
+    internalField   uniform 1.8E-08;
+
+    boundaryField
+    {
+        INLET
+        {
+        type            inletOutlet;
+        inletValue      $internalField;
+        value           $internalField;
+        }
+
+        OUTLET
+        {
+        type            outletInlet;
+        outletValue     $internalField;
+        value           $internalField;
+        }
+
+        ".*"
+        {
+            type            kLowReWallFunction;
+            value            $internalField;
+        }
+
+        defaultFaces
+        {
+            type            empty;
+        }
+    }
+}
+
+nut
+{
+    internalField   uniform 0;
+
+    boundaryField
+    {
+        INLET
+        {
+        type            calculated;
+        value           uniform 0;
+        }
+
+        OUTLET
+        {
+        type            calculated;
+        value           uniform 0;
+        }
+
+        ".*"
+        {
+        type            nutkWallFunction;
+        value           uniform 0;
+        }
+
+        defaultFaces
+        {
+            type            empty;
+        }
+    }
+}
+
+alphat
+{
+    internalField   uniform 0;
+    
+    boundaryField
+    {
+        INLET
+        {
+            type            calculated;
+            value           $internalField;
+        }
+        OUTLET
+        {
+            type            calculated;
+            value           $internalField;
+        }
+
+        ".*"
+        {
+            type            compressible::alphatWallFunction;
+            value           $internalField;
+        }
+    }
+}
+
+
+p_rgh
+{
+    internalField   uniform 1E+5;
+
+    boundaryField
+    {
+        WALL_FREE_SURFACE
+        {
+        type            fixedFluxPressure;
+        value           uniform 0;
+        }
+
+        INLET
+        {
+        type            fixedFluxPressure;
+        value           uniform 0;
+        }
+
+        OUTLET
+        {
+            type       totalPressure;
+            p0         uniform 1E+5;
+            value      uniform 1E+5;
+        }
+
+        WALL_EL_SIDE
+        {
+        type            fixedFluxPressure;
+        value           uniform 0;
+        }
+
+        ".*"
+        {
+            type            fixedFluxPressure;
+            value           uniform 0;
+        }
+    }
+}
+
+p
+{
+    internalField   uniform 1E+5;
+
+    boundaryField
+    {
+        ".*"
+        {
+            type            calculated;
+            value           uniform 1E+5;
+        }
+    }
+}
+
+// ************************************************************************* //

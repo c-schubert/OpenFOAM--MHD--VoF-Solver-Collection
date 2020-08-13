@@ -1,0 +1,47 @@
+EXE_INC = \
+    -I. \
+    -I../compressibleInterFlow \
+    -I$(FOAM_SOLVERS)/multiphase/compressibleInterFoam/twoPhaseMixtureThermo \
+    -I$(FOAM_SOLVERS)/multiphase/compressibleInterFoam/VoFphaseCompressibleTurbulenceModels/lnInclude \
+    -I$(LIB_SRC)/transportModels/twoPhaseMixture/lnInclude \
+    -I$(LIB_SRC)/transportModels \
+    -I$(LIB_SRC)/transportModels/incompressible/lnInclude \
+    -I$(LIB_SRC)/transportModels/interfaceProperties/lnInclude \
+    -I$(LIB_SRC)/transportModels/immiscibleIncompressibleTwoPhaseMixture/lnInclude \
+    -I$(LIB_SRC)/transportModels/compressible/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I$(LIB_SRC)/transportModels/interfaceProperties/lnInclude \
+    -I$(LIB_SRC)/TurbulenceModels/turbulenceModels/lnInclude \
+    -I$(LIB_SRC)/TurbulenceModels/compressible/lnInclude \
+    -I$(LIB_SRC)/TurbulenceModels/phaseCompressible/lnInclude \
+    -I$(LIB_SRC)/dynamicMesh/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/dynamicFvMesh/lnInclude \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/sampling/lnInclude \
+    -I../../libs/of-cpad-library/src/lnInclude \
+    -I../../libs/VoF_Library/VoF/lnInclude 
+
+EXE_LIBS = \
+    -ltwoPhaseMixture \
+    -limmiscibleIncompressibleTwoPhaseMixture \
+    -ltwoPhaseMixtureThermo \
+    -lcompressibleTransportModels \
+    -ltwoPhaseSurfaceTension \
+    -lfluidThermophysicalModels \
+    -lspecie \
+    -ltwoPhaseProperties \
+    -linterfaceProperties \
+    -lturbulenceModels \
+    -lcompressibleTurbulenceModels \
+    -lVoFphaseCompressibleTurbulenceModels \
+    -ldynamicMesh \
+    -lmeshTools \
+    -ldynamicFvMesh \
+    -lfiniteVolume \
+    -lfvOptions \
+    -L$(FOAM_USER_LIBBIN) \
+    -lsampling \
+    -lcpad \
+    -lVoFLibrary
+    

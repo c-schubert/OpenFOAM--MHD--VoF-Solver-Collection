@@ -1,0 +1,234 @@
+! IMPORTANT:
+! used a modified SOLVER.KEYWORDS located in /opt/elmerfem/elmer-mpi-install/share/elmersolver/lib/SOLVER.KEYWORDS with eof_mod library
+! $ for(i=1:nexp) "Solver:Integer: 'Body " i2str(i) " Use Target Variable'"
+! Solver:Integer:     'Bodies'
+!CHECK KEYWORDS Warn  to avoid  If new keywords are introduced, misleading warning messages can be avoided by adding the new keywords to the keyword file SOLVER.KEYWORDS (TODO)
+
+Header
+  CHECK KEYWORDS Warn 				
+  Mesh DB "." "meshElmer"
+  Include Path ""
+  Results Directory ""
+End
+
+Simulation
+  Max Output Level = 10
+  Coordinate System = Cartesian
+  Coordinate Mapping(3) = 1 2 3
+  Simulation Type = Steady state
+  Steady State Max Iterations = 10000000
+  Steady State Min Iterations = 10000000
+  Output Intervals = 2 !2
+  Timestepping Method = BDF
+  BDF Order = 2
+  Frequency = 50
+  Angular Frequency =  Real MATC "2*pi*50"
+  Solver Input File = case.sif
+  !Post File = case.vtu  ! comment for no elmer output
+End
+
+Constants
+  Gravity(4) = 0 -1 0 9.82
+  Stefan Boltzmann = 5.67e-08
+  Permittivity of Vacuum = 8.8542e-12
+  Permeability of Vacuum = 1.257e-6
+  Boltzmann Constant = 1.3807e-23
+  Unit Charge = 1.602e-19
+End
+
+
+Body 1
+  Target Bodies(2) =  7 1
+  Name = "Elektrode"
+  Equation = 1
+  Material = 2
+End
+
+Body 2
+  Target Bodies(3) = 2 3 4
+  Name = "Mixture"
+  Equation = 1
+  Material = 1
+End
+
+Body 3
+  Target Bodies(1) = 5
+  Name = "SlagSkin"
+  Equation = 1
+  Material = 4
+End
+
+Body 4
+  Target Bodies(1) =  6
+  Name = "Mould"
+  Equation = 1
+  Material = 3
+End
+
+Solver 1
+  Equation = OpenFOAM2ElmerMixture
+  Procedure = "OpenFOAM2Elmer" "OpenFOAM2ElmerSolver"
+
+  Target Variable 1 = String "OF conductivity"
+End
+
+Solver 2
+  Equation = MgHarm
+  Procedure = "MagnetoDynamics" "WhitneyAVHarmonicSolver"
+  Fix Input Current Density = True
+  Automated Source Projection BCs = True
+  Angular Frequency =  Real MATC "2*pi*50"
+  Exec Solver = Always
+  Bubbles In Global System = True
+  Lumped Mass Matrix = False
+  Optimize Bandwidth = False
+  Use Piola Transform = False
+  Use Tree Gauge = False
+  Quadratic Approximation = False
+  Steady State Convergence Tolerance = 1.0e-6
+  Linear System Abort Not Converged = False
+  Linear System Solver = Iterative
+  Linear System Direct Method = none
+  Linear System Iterative Method = BiCGstabl
+  Linear System Max Iterations = 40000
+  Linear System Convergence Tolerance = 1.0e-8
+  BiCGstabl polynomial degree = 4
+  Linear System Preconditioning = None
+  Linear System ILUT Tolerance = 1.0e-4
+  Linear System Abort Not Converged = True
+  Linear System Residual Output = 10
+  Linear System Precondition Recompute = 10000000
+  
+  Reference Norm = Real 6.16456343E-04
+  Reference Norm Tolerance = Real 1E-8
+  
+  Exported Variable 1 = -dg "OF conductivity"
+  Exported Variable 1 Mask = String "material: mapping"
+End
+
+Solver 3
+  Equation = MgDynPost
+  
+  Calculate Current Density = True
+  Procedure = "MagnetoDynamics" "MagnetoDynamicsCalcFields"
+  Angular Frequency =  Real MATC "2*pi*50"
+  Discontinuous Bodies = True
+  Calculate Electric Field = Logical True
+  Calculate Magnetic Field Strength = Logical True
+  Calculate Joule Heating = Logical True
+  Calculate JxB = Logical True
+  Exec Solver = Before Saving
+  Stabilize = True
+  Bubbles = False
+  Lumped Mass Matrix = False
+  Optimize Bandwidth = True
+  Steady State Convergence Tolerance = 1.0e-5
+  Nonlinear System Convergence Tolerance = 1.0e-7
+  Nonlinear System Max Iterations = 20
+  Nonlinear System Newton After Iterations = 3
+  Nonlinear System Newton After Tolerance = 1.0e-3
+  Nonlinear System Relaxation Factor = 1
+  Linear System Solver = Iterative
+  Linear System Iterative Method = BiCGStab
+  Linear System Max Iterations = 500
+  Linear System Convergence Tolerance = 1.0e-10
+  BiCGstabl polynomial degree = 4
+  Linear System Preconditioning = ILU0
+  Linear System ILUT Tolerance = 1.0e-3
+  Linear System Abort Not Converged = False
+  Linear System Residual Output = 10
+  Linear System Precondition Recompute = 1
+End
+
+Solver 4
+  Equation = Elmer2OpenFoamMixture
+  Procedure = "Elmer2OpenFOAM" "Elmer2OpenFOAMSolver"
+
+  Bodies(3) = 2 4 3
+  Body 1 Use Target Variable(4) = 1 1 1 1
+  Body 2 Use Target Variable(4) = 0 0 0 1
+  Body 3 Use Target Variable(4) = 0 0 0 1
+  
+  Target Variable 1 = jxb re 1
+  Target Variable 2 = jxb re 2
+  Target Variable 3 = jxb re 3
+  Target Variable 4 = joule heating  ! mixture
+End 
+
+Equation 1
+  Name = "MgDynHarm"
+  Active Solvers(4) = 1 2 3 4
+End
+
+Material 1
+  Name = "Mixture"
+  Relative Permeability = 1
+  Relative Permittivity = 1
+  Electric Conductivity = Equals "OF conductivity"
+  mapping = Logical True
+End
+
+Material 2
+  Name = "Steel_12344"
+  Relative Permeability = 1.0011
+  Relative Permittivity = 1
+  Electric Conductivity = 1.84e+6
+  Density = 7744
+End
+
+Material 3
+  Name = "Copper (SF-CU)"
+  Electric Conductivity = 4301.075
+    !Electric Conductivity = 43e6
+  Heat expansion Coefficient = 16.5e-6
+  Relative Permeability = 0.999994
+  Relative Permittivity = 1
+  Heat Conductivity = 305.0
+  Sound speed = 3810.0
+  Heat Capacity = 385.0
+  Mesh Poisson ratio = 0.34
+  Density = 8940.0
+  Poisson ratio = 0.34
+  Youngs modulus = 115.0e9
+End
+
+Material 4
+  Name = "SlagSkin"
+  Relative Permeability = 1
+  Relative Permittivity = 1
+  Density = 2600
+  Electric Conductivity = 0.2 !(part Insulating)
+  ! Electric Conductivity = 0.002 !(Iso)
+End 
+
+
+Boundary Condition 1
+  Target Boundaries(1) = 1 
+  Name = "Current_In"
+  AV re {e} 1 = 0
+  AV re {e} 2 = 0
+  AV im = 0
+  AV im {e} 1 = 0
+  AV im {e} 2 = 0
+  Electric Current Density = Real MATC "3100/((53.25E-3)^2*pi)"  
+End
+
+Boundary Condition 2
+  Target Boundaries(1) = 3
+  Name = "Current_Out"
+  AV re = 0
+  AV re {e} 1 = 0
+  AV re {e} 2 = 0
+  AV im = 0
+  AV im {e} 1 = 0
+  AV im {e} 2 = 0
+End
+
+Boundary Condition 3
+  Target Boundaries(1) = 2
+  Name = "AV_X_Y_0"
+  AV re {e} 1 = 0
+  AV re {e} 2 = 0
+  AV im {e} 1 = 0
+  AV im {e} 2 = 0
+End

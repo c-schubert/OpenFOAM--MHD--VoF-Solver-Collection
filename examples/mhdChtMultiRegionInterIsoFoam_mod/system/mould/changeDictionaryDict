@@ -1,0 +1,69 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v1912                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system/mould";
+    object      changeDictionaryDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+boundary
+{
+    WALL_MOULD_AUSSEN
+    {
+        type            patch;
+    }
+    WALL_MOULD_TOP
+    {
+        type            patch;
+    }
+    WALL_MOULD_BOT
+    {
+        type            patch;
+    }
+}
+
+T
+{
+    internalField   uniform 300;
+
+    boundaryField
+    {
+        WALL_MOULD_AUSSEN
+        {
+            type            externalWallHeatFluxTemperature;
+
+            mode            coefficient;
+
+            Ta              uniform 288.15;
+            h               uniform 10500;
+            kappaMethod     solidThermo;
+            value          uniform 300;
+
+        }
+
+        ".*"
+        {
+            type            zeroGradient;
+            value           uniform 300;
+        }
+
+        "mould_to_.*"
+        {
+            type            compressible::turbulentTemperatureCoupledBaffleMixed;
+            Tnbr            T;
+            kappaMethod     solidThermo;
+            value           uniform 300;
+        }
+    }
+}
+
+// ************************************************************************* //

@@ -1,0 +1,62 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  v1912                                 |
+|   \\  /    A nd           | Website:  www.openfoam.com                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system/skin";
+    object      changeDictionaryDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+
+boundary
+{
+    WALL_SLAG_SKIN_TOP
+    {
+        type            patch;
+    }
+    WALL_SLAG_SKIN_BOT
+    {
+        type            patch;
+    }
+}
+
+
+T
+{
+    internalField   uniform 300;
+
+    boundaryField
+    {
+
+        "WALL_SLAG_SKIN_TOP"
+        {
+            type            zeroGradient;
+            value           uniform 300;
+        }
+
+        "WALL_SLAG_SKIN_BOT"
+        {
+            type            zeroGradient;
+            value           uniform 300;
+        }
+
+        "skin_to_.*"
+        {
+            type            compressible::turbulentTemperatureCoupledBaffleMixed;
+            Tnbr            T;
+            kappaMethod     solidThermo;
+            value           uniform 300;
+        }
+    }
+}
+
+
+// ************************************************************************* //

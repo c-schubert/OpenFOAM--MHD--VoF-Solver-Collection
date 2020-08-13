@@ -1,0 +1,45 @@
+sinclude $(GENERAL_RULES)/mplib$(WM_MPLIB)
+sinclude $(RULES)/mplib$(WM_MPLIB)
+
+EXE_INC = \
+    -I. \
+    -I$(FOAM_SOLVERS)/multiphase/compressibleInterFoam/twoPhaseMixtureThermo \
+    -I ../mhdVarRhoInterFoam \
+    -I../../libs/VoF \
+    -I$(LIB_SRC)/finiteVolume/lnInclude \
+    -I$(LIB_SRC)/meshTools/lnInclude \
+    -I$(LIB_SRC)/sampling/lnInclude \
+    -I$(LIB_SRC)/dynamicFvMesh/lnInclude \
+    -I$(LIB_SRC)/transportModels \
+    -I$(LIB_SRC)/transportModels/incompressible/lnInclude \
+    -I$(LIB_SRC)/transportModels/interfaceProperties/lnInclude \
+    -I$(LIB_SRC)/transportModels/twoPhaseMixture/lnInclude \
+    -I$(LIB_SRC)/TurbulenceModels/turbulenceModels/lnInclude \
+    -I$(LIB_SRC)/transportModels/compressible/lnInclude \
+    -I$(LIB_SRC)/thermophysicalModels/basic/lnInclude \
+    -I../../libs/varRhoIncompressible/lnInclude \
+    -I$(LIB_SRC)/transportModels/immiscibleIncompressibleTwoPhaseMixture/lnInclude \
+    -I../../libs/of-cpad-library/src/lnInclude \
+    -I../../libs/eof/coupleElmer/lnInclude \
+    -I$(LIB_SRC)/Pstream/mpi/lnInclude \
+     $(PFLAGS) $(PINC)
+
+EXE_LIBS = \
+    -ltwoPhaseMixture \
+    -ltwoPhaseMixtureThermo \
+    -ltwoPhaseProperties \
+    -lcompressibleTransportModels \
+    -lfiniteVolume \
+    -lfvOptions \
+    -lmeshTools \
+    -lsampling \
+    -lincompressibleTransportModels \
+    -linterfaceProperties \
+    -limmiscibleIncompressibleTwoPhaseMixture \
+    -lturbulenceModels \
+    -L$(FOAM_USER_LIBBIN) \
+    -lcpad \
+    -lvarRhoIncompressibleTurbulenceModels \
+    -lwaveModels \
+    -lElmer
+

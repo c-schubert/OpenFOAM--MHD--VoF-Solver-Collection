@@ -1,0 +1,8 @@
+FOAM_MAJOR_VERSION=$(firstword $(subst ., ,$(WM_PROJECT_VERSION)))
+
+UOPwrite.C
+UIPread.C
+UPstream.C
+PstreamGlobals.C
+
+LIB = $(FOAM_USER_LIBBIN)/libPstream

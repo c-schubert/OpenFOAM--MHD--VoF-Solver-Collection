@@ -1,0 +1,180 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     | Version:  4.0                                   |
+|   \\  /    A nd           | Web:      www.OpenFOAM.org                      |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system/mixture";
+    object      fvSolution;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+solvers
+{
+    "alpha.metal.*"
+    {
+        // VoF-Library slightly differnt than OF-1912 interIsoFoam ...
+	    advectionScheme isoAdvector;    
+
+        nAlphaCorr      4;
+        nAlphaSubCycles 2;
+        cAlpha          1;
+
+        reconstructionSchemes plicRDF; // isoAlpha
+		
+		vof2IsoTol 		1e-8;
+        surfCellTol     1e-8;
+		writeVTK false;
+        nAlphaBounds    3;
+        snapTol         1e-12;
+        clip            true;
+
+        writeSurfCells      false;
+        writeBoundedCells   false;
+        writeIsoFaces       false;
+
+        gradAlphaNormal false;
+    }
+
+    "pcorr.*"
+    {
+        solver          PCG;
+        preconditioner
+        {
+            preconditioner  GAMG;
+            tolerance       1e-6;
+            relTol          0;
+            smoother        DICGaussSeidel;
+        }
+        tolerance       1e-7;
+        relTol          0;
+        maxIter         100;
+    }
+    
+    rho
+    {
+        solver          PCG;
+        preconditioner  DIC;
+        tolerance       1e-7;
+        relTol          0.1;
+    }
+
+    rhoFinal
+    {
+        $rho;
+        tolerance       1e-7;
+        relTol          0;
+    }
+
+    p_rgh
+    {
+        solver           GAMG;
+        tolerance        1e-8;
+        relTol           0.0001;
+        smoother         GaussSeidel;
+        maxIter          50;
+    }
+
+    p_rghFinal
+    {
+        $p_rgh;
+        relTol          0;
+    }
+
+    "(U).*"
+    {
+        solver          smoothSolver;
+        smoother        GaussSeidel;
+        minIter         1;
+        tolerance       1e-06;
+        relTol          0;
+    }
+
+    "(h|T|k|omega|epsilon|nuTilda).*"
+    {
+        solver          smoothSolver;
+        smoother        symGaussSeidel;
+        minIter         1;
+        tolerance       1e-08;
+        relTol          0;
+    }
+
+    Phi
+    {
+        solver GAMG;
+        smoother DIC;
+        cacheAgglomeration on;
+        agglomerator faceAreaPair;
+        nCellsInCoarsestLevel 10;
+        mergeLevels 1;
+
+        tolerance 1e-06;
+        relTol 0.001;
+    }
+
+}
+
+PIMPLE
+{
+    corretPhi           		yes;
+    momentumPredictor   		no; /
+    transonic                   no;
+    nCorrectors         		2; 
+    nOuterCorrectors    		1;
+    nNonOrthogonalCorrectors 	2; 
+    correctPhi     				yes;
+	consistent					yes;
+    turbOnFinalIterOnly         false; 
+
+    pRefPoint      (0 0 -0.15);
+    pRefValue      1E+5;
+
+    // will not work in chtMultiRegion solver ..
+	residualControl
+    {
+        "(alpha.metal|alpha|U|h|T|k|epsilon)"
+        {
+                tolerance  1e-6;
+                relTol      0;
+        }
+        "(p_rgh|rho)"
+        {
+                tolerance  1e-5;
+                relTol      0;
+        }
+     }
+}
+
+potentialFlow
+{
+    nNonOrthogonalCorrectors 5;
+    PhiRefCell 0;
+    PhiRefValue 0;
+}
+
+relaxationFactors
+{	
+
+    fields
+    {
+        p      0.3;
+        pFinal   1;
+    }
+    equations
+	{	
+		U     					0.7;
+        "(k|epsilon)"     		0.8;
+        "(h|T|U|k|epsilon)Final"   1;
+    }
+}
+
+
+
+
+// ************************************************************************* //
