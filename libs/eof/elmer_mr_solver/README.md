@@ -10,13 +10,13 @@ The following changes have to be made bevor using this:
 modifiy - SOLVER.KEYWORDS in /opt/elmerfem/elmer-mpi-install/share/elmersolver/lib 
 
 
-addiational entries are: 
+additional entries are: 
 
 $ for(i=1:nexp) "Solver:Integer: 'Body " i2str(i) " Use Target Variable'"
 Solver:Integer:     'Bodies'
 
 
-There seems to be some identical fuctionallity also introduced in development 
+There seems to be some identical functionality also introduced in development 
 branch of the EOF library, but I have not tested it by now.
 
 https://github.com/jvencels/EOF-Library/tree/devel

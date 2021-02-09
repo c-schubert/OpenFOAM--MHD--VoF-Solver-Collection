@@ -122,7 +122,7 @@ solvers
 
 PIMPLE
 {
-    corretPhi           		yes;
+    correctPhi           		yes;
     momentumPredictor   		no; /
     transonic                   no;
     nCorrectors         		2; 

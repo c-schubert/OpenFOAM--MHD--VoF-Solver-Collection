@@ -55,7 +55,7 @@ Furthermore there reside some default solver in this the solver directory of thi
 
 ## Compilation and Usage
 
-Short description of setup proccedure:
+Short description of setup procedure:
   - Download this repository
   - Download and compile elmer
   - Download and compile OpenFOAM
@@ -63,6 +63,11 @@ Short description of setup proccedure:
   - modify and source `./etc/.bashrc` file
   - install eof (v1912) commsplit fix (see `./libs/commSplit_modifed_1912` - you may to have root rights for that, depending on OpenFOAM install directory location)
   - compile the needed solver (`./solver/...`) by going to the directory and running wmake (maybe you have to compile some solver dependency (i.e. other solver) bevore!)
+  - For the multiRegion (cht*mhd) solver to work you have do do several steps:
+    - source `./etc/bashrc`
+    - run alias `eof1912_mrmod` 
+    - run `eof_compile()` (once)
+    - apply some modifications to elmer installation as described in  `./libs/eof/elmer_mr/README.md`
 
 ## Examples
 
@@ -87,7 +92,7 @@ Here you can see some example field calculated by the "mhdChtMultiRegionInterIso
 The Elmer FEM development (devel) branch (latest commit 521752c2a1ccc7c046e41254ad84c61939d5a7c2, 31.1.2020) was used/tested for the EOF coupled solvers. Here version changes may also introduce problems but are less likely to.
 
 
-*The project in which the work on this solver was fundet is over by now, so I wont be able to make many enhancements in the near future myself. We hope there will be future projects to make more enhancements to these solver collection. Nevertheless if there may be any pull request I will try to have a look ...*
+> *The project in which the work on this solver was founded is over by now, so I wont be able to make many enhancements in the near future myself. Neither I am able to give extensive support for you people out there :(, so do not expect to much from filing an issue. We hope there will be future projects to make more enhancements to these solver collection. Nevertheless if there may be any pull request I will try to have a look ...*
 
 ## Acknowledgment
 The authors gratefully acknowledge the support of the
